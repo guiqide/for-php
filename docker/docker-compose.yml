@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  web:
+    image: nginx:1.17.10
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./web:/data
+      - ./nginx/conf:/etc/nginx/conf.d
+    ports:
+      - 80:80
+    links:
+      - php
+  php:
+    image: php:7.1-fpm
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./web:/data # 必须将php和web的数据盘挂载到相同地方，否则$document_root指向不同的地方，而且连输出document_root都不行
+      - ./php/etc:/usr/local/etc
+      # 不需要将9000端口到处去，因为links已经指向了9000端口
+    links:
+      - db
+      - redis
+  db:
+    image: mysql:5.7
+    container_name: mysql-msh
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=99@123
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:5.0.9
+    container_name: redis
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis:/usr/local/etc/redis
+    ports:
+      - 6379:6379
