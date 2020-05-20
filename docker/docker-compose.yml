@@ -4,21 +4,25 @@ services:
     image: nginx:1.17.10
     container_name: nginx
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
-      - ./web:/data
+      - ../www:/data
       - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/log:/var/log/nginx
     ports:
       - 80:80
     links:
-      - php
-  php:
-    image: php:7.1-fpm
-    build:
-      context: ./php
-      dockerfile: Dockerfile
+      - php-fpm
+  php-fpm:
+    container_name: php-fpm
+    build: ./images/php-fpm
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
-      - ./web:/data # 必须将php和web的数据盘挂载到相同地方，否则$document_root指向不同的地方，而且连输出document_root都不行
+      - ../www:/data # 必须将php和www的数据盘挂载到相同地方，否则$document_root指向不同的地方，而且连输出document_root都不行
       - ./php/etc:/usr/local/etc
+      - ./php/log:/var/log/php
       # 不需要将9000端口到处去，因为links已经指向了9000端口
     links:
       - db
@@ -30,6 +34,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - MYSQL_ROOT_PASSWORD=99@123
+      # - MYSQL_DATABASE=laravel
+      # - MYSQL_USER=laravel
     volumes:
       - ./mysql/data:/var/lib/mysql
     ports:
@@ -38,6 +44,8 @@ services:
     image: redis:5.0.9
     container_name: redis
     restart: always
+    environment:
+      - TZ=Asia/Shanghai
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis:/usr/local/etc/redis

@@ -1,1 +1,4 @@
 mysql/
+www/
+docker/nginx/log/
+docker/php/log/
