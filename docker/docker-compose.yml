@@ -51,3 +51,11 @@ services:
       - ./redis:/usr/local/etc/redis
     ports:
       - 6379:6379
+  supervisor:
+    container_name: supervisor
+    build: ./images/supervisor
+    restart: always
+    volumes:
+      - ./images/supervisor/conf:/etc/supervisor
+    links:
+      - php-fpm

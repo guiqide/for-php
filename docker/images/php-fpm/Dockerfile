@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install -y \
   && docker-php-ext-enable zip \
   # clean
   && docker-php-source delete \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* 
+
 
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
